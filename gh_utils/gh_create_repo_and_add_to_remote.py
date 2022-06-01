@@ -8,7 +8,9 @@ Purpose: gh_create_repo_and_add_to_remote
 import argparse
 from pathlib import Path
 import subprocess
-from . import __version__, __app_name__
+from . import __version__
+
+__app_name__ = 'ghcrar'
 
 
 class NotFoundError(Exception):
@@ -37,7 +39,6 @@ def gh_config_host_file_get_username() -> str:
     raise NotFoundError(f'Username not found in {str(host_file_path)}')
 
 
-# --------------------------------------------------
 def get_args():
     """Get command-line arguments"""
 
