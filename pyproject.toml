@@ -20,6 +20,10 @@ ghcrar = "gh_utils.gh_create_repo_and_add_to_remote:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+PyYAML = "^6.0"
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

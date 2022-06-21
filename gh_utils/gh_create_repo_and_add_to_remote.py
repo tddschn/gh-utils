@@ -8,35 +8,15 @@ Purpose: gh_create_repo_and_add_to_remote
 import argparse
 from pathlib import Path
 import subprocess
-from . import __version__
+from . import __version__, NotFoundError
+from .utils import (
+    gh_config_yaml_get_user_info,
+    gh_config_yaml_get_user_info_first,
+    gh_config_yaml_get_first_hostname_and_username,
+    hostname_to_user,
+)
 
 __app_name__ = 'ghcrar'
-
-
-class NotFoundError(Exception):
-    pass
-
-
-def gh_config_host_file_get_username() -> str:
-    """Get authenticated user's username of gh
-    from gh's config host file.
-
-    This function was created because gh doesn't implement a way to get the username
-    without making network calls.
-
-    Returns:
-        str: username
-    """
-    host_file_path = Path.home() / '.config/gh/hosts.yml'
-    pref = '    user: '
-    with open(host_file_path) as fh:
-        while 1:
-            line = fh.readline()
-            if not line:
-                break
-            if line.startswith(pref):
-                return line.removeprefix(pref).strip()
-    raise NotFoundError(f'Username not found in {str(host_file_path)}')
 
 
 def get_args():
@@ -82,6 +62,15 @@ def get_args():
     )
 
     parser.add_argument(
+        '-H',
+        '--hostname',
+        help='GitHub hostname, default to use the first entry in hosts.yml',
+        default=gh_config_yaml_get_first_hostname_and_username()[0],
+        choices=['ssh', 'https'],
+    )
+
+    parser.add_argument('-p', '--protocol', help='git protocol', default='ssh')
+    parser.add_argument(
         '-V', '--version', action='version', version=f'%(prog)s {__version__}'
     )
 
@@ -94,6 +83,8 @@ def main():
     name = args.name
     public = args.public
     overwrite_remote_origin = args.overwrite_remote_origin
+    hostname = args.hostname
+    protocol = args.protocol
 
     curr_path_name = Path.cwd().name
     if name is not None:
@@ -110,7 +101,7 @@ def main():
     remotes = remotes_p.stdout.splitlines()
     # print(remotes)
     remote_origin_exists = b'origin' in remotes
-    gh_username = gh_config_host_file_get_username()
+    gh_username = hostname_to_user(hostname)
     if remote_origin_exists:
         print('Remote origin exists.')
         if overwrite_remote_origin:
@@ -119,7 +110,13 @@ def main():
         else:
             subprocess.run(['git', 'remote', 'rename', 'origin', 'upstream'])
             print('Renamed previous remote to upstream.')
-    remote_url = f'git@github.com:{gh_username}/{repo_name}.git'
+    if protocol == 'ssh':
+        remote_url_prefix = f'git@{hostname}:'
+    elif protocol == 'https':
+        remote_url_prefix = f'https://{hostname}/'
+    else:
+        raise ValueError(f'Unknown protocol: {protocol}')
+    remote_url = f'{remote_url_prefix}{gh_username}/{repo_name}.git'
     subprocess.run(['git', 'remote', 'add', 'origin', remote_url])
     print(f'Added remote: {remote_url}')
 
