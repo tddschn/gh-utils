@@ -54,7 +54,7 @@ def get_args():
     )
 
     parser.add_argument(
-        '--overwrite_remote_origin',
+        '--overwrite-remote-origin',
         '--force',
         help='Overwrites remote origin if exists',
         action='store_true',

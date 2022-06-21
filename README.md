@@ -8,7 +8,7 @@ A collection of useful utilities that work with GitHub CLI `gh`.
     - [pip](#pip)
   - [Utilities](#utilities)
     - [ghcrar](#ghcrar)
-      - [Source: gh_create_repo_and_add_to_remote.py](#source-gh_create_repo_and_add_to_remotepy)
+      - [Features](#features)
       - [Usage](#usage)
       - [Screenshots](#screenshots)
 
@@ -33,15 +33,16 @@ $ pip install gh-utils
 ### ghcrar
 
 
-#### Source: [gh_create_repo_and_add_to_remote.py](gh_utils/gh_create_repo_and_add_to_remote.py)
-
+#### Features
+- Custom GitHub instance hostname support with `--hostname`
+- Supports both `ssh` and `https` protocols
 
 #### Usage
 
 ```
 $ ghcrar --help
 
-usage: ghcrar [-h] [-a SUFFIX] [-n GITHUB REPO NAME] [--public] [--overwrite_remote_origin] [-V]
+usage: ghcrar [-h] [-a SUFFIX] [-n GITHUB REPO NAME] [--public] [--overwrite_remote_origin] [-H {ssh,https}] [-p PROTOCOL] [-V]
 
 Create a GitHub repo with gh and add it as a remote
 
@@ -52,8 +53,12 @@ options:
   -n GITHUB REPO NAME, --name GITHUB REPO NAME
                         The string to use as GitHub repo name (default: None)
   --public              Create a public repository (default: False)
-  --overwrite_remote_origin, --force
+  --overwrite-remote-origin, --force
                         Overwrites remote origin if exists (default: False)
+  -H {ssh,https}, --hostname {ssh,https}
+                        GitHub hostname, default to use the first entry in hosts.yml (default: github.com)
+  -p PROTOCOL, --protocol PROTOCOL
+                        git protocol (default: ssh)
   -V, --version         show program's version number and exit
 ```
 
