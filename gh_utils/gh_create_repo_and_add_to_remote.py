@@ -116,7 +116,10 @@ def main():
         remote_url_prefix = f'https://{hostname}/'
     else:
         raise ValueError(f'Unknown protocol: {protocol}')
-    remote_url = f'{remote_url_prefix}{gh_username}/{repo_name}.git'
+    if '/' not in repo_name:
+        remote_url = f'{remote_url_prefix}{gh_username}/{repo_name}.git'
+    else:
+        remote_url = f'{remote_url_prefix}{repo_name}.git'
     subprocess.run(['git', 'remote', 'add', 'origin', remote_url])
     print(f'Added remote: {remote_url}')
 
