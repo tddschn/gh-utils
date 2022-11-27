@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gh-utils"
-version = "0.5.0"
+version = "0.5.1"
 description = "GitHub CLI Utilities"
 authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
 license = "MIT"
