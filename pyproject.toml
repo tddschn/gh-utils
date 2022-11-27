@@ -1,15 +1,13 @@
 [tool.poetry]
 name = "gh-utils"
-version = "0.2.4"
+version = "0.3.0"
 description = "GitHub CLI Utilities"
 authors = ["Xinyuan Chen <45612704+tddschn@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/tddschn/gh-utils"
 repository = "https://github.com/tddschn/gh-utils"
-classifiers = [
-    "Topic :: Utilities"
-]
+classifiers = ["Topic :: Utilities"]
 keywords = ["gh", "github", "utils"]
 
 [tool.poetry.scripts]
@@ -25,9 +23,6 @@ PyYAML = "^6.0"
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.4.0"
 pytest = "^7.2.0"
-
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
 black = "^22.3.0"
 better-exceptions = "^0.3.3"
 
