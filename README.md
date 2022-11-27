@@ -11,6 +11,7 @@ A collection of useful utilities that work with GitHub CLI `gh`.
       - [Features](#features)
       - [Usage](#usage)
       - [Screenshots](#screenshots)
+  - [Develop](#develop)
 
 ## Installation
 
@@ -66,4 +67,10 @@ options:
 ![ghcrar-public](images/ghcrar-public.png)
 
 
+## Develop
 
+```
+$ git clone https://github.com/tddschn/gh-utils.git
+$ cd gh-utils
+$ poetry install
+```
