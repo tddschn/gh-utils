@@ -42,7 +42,7 @@ $ pip install gh-utils
 ```
 $ ghcrar --help
 
-usage: ghcrar [-h] [-a SUFFIX] [-n GITHUB REPO NAME] [--public] [--overwrite_remote_origin] [-H {ssh,https}] [-p PROTOCOL] [-V]
+usage: ghcrar [-h] [-a SUFFIX] [-n GITHUB REPO NAME] [--public] [--overwrite-remote-origin] [-H {ssh,https}] [-p PROTOCOL] [-V]
 
 Create a GitHub repo with gh and add it as a remote
 
@@ -51,7 +51,7 @@ options:
   -a SUFFIX, --append SUFFIX
                         String to append to the repo name (default: None)
   -n GITHUB REPO NAME, --name GITHUB REPO NAME
-                        The string to use as GitHub repo name (default: None)
+                        The string to use as GitHub repo name, or <user|org>/<repo-name> with a slash (default: None)
   --public              Create a public repository (default: False)
   --overwrite-remote-origin, --force
                         Overwrites remote origin if exists (default: False)

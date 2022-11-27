@@ -8,10 +8,8 @@ Purpose: gh_create_repo_and_add_to_remote
 import argparse
 from pathlib import Path
 import subprocess
-from . import __version__, NotFoundError
+from . import __version__
 from .utils import (
-    gh_config_yaml_get_user_info,
-    gh_config_yaml_get_user_info_first,
     gh_config_yaml_get_first_hostname_and_username,
     hostname_to_user,
 )
@@ -40,7 +38,7 @@ def get_args():
     parser.add_argument(
         '-n',
         '--name',
-        help='The string to use as GitHub repo name',
+        help='The string to use as GitHub repo name, or <user|org>/<repo-name> with a slash',
         metavar='GITHUB REPO NAME',
         type=str,
         default=None,
