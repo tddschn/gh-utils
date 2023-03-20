@@ -66,7 +66,10 @@ options:
 ```
 
 #### Screenshots
+
 ![ghcrar-public](images/ghcrar-public.png)
+
+![](images/ghcrar-dupe-url-and-set-default.png)
 
 
 ## Develop
