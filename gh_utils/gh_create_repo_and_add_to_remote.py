@@ -111,8 +111,8 @@ def main():
         hostname, protocol, repo_name, gh_username
     )
     if not args.no_set_default:
-        subprocess.run(['gh', 'repo', 'set-default', f'{gh_username}/{repo_name}'])
         print(f'Running `gh repo set-default {gh_username}/{repo_name}`')
+        subprocess.run(['gh', 'repo', 'set-default', f'{gh_username}/{repo_name}'])
     if remote_origin_exists:
         print('Remote origin exists.')
         # run `git remote get-url origin` to get the url for the remote
