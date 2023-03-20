@@ -33,6 +33,7 @@ $ pip install gh-utils
 
 ### ghcrar
 
+Short for `gh_create_repo_and_add_to_remote`
 
 #### Features
 - Custom GitHub instance hostname support with `--hostname`
