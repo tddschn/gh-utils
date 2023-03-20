@@ -70,7 +70,10 @@ def get_args():
 
     parser.add_argument('-p', '--protocol', help='git protocol', default='ssh')
     parser.add_argument(
-        '-S', '--no-set-default', help='Do not run `gh repo set-default`'
+        '-S',
+        '--no-set-default',
+        help='Do not run `gh repo set-default`',
+        action='store_true',
     )
     parser.add_argument(
         '-V', '--version', action='version', version=f'%(prog)s {__version__}'

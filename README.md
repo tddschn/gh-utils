@@ -43,7 +43,7 @@ $ pip install gh-utils
 ```
 $ ghcrar --help
 
-usage: ghcrar [-h] [-a SUFFIX] [-n GITHUB REPO NAME] [--public] [--overwrite-remote-origin] [-H {ssh,https}] [-p PROTOCOL] [-V]
+usage: ghcrar [-h] [-a SUFFIX] [-n GITHUB REPO NAME] [--public] [--overwrite-remote-origin] [-H {ssh,https}] [-p PROTOCOL] [-S] [-V]
 
 Create a GitHub repo with gh and add it as a remote
 
@@ -60,6 +60,7 @@ options:
                         GitHub hostname, default to use the first entry in hosts.yml (default: github.com)
   -p PROTOCOL, --protocol PROTOCOL
                         git protocol (default: ssh)
+  -S, --no-set-default  Do not run `gh repo set-default` (default: False)
   -V, --version         show program's version number and exit
 ```
 
