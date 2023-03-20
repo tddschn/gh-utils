@@ -6,6 +6,7 @@ Purpose: gh_create_repo_and_add_to_remote
 """
 
 import argparse
+from functools import cache
 from pathlib import Path
 import subprocess
 from . import __version__
@@ -69,6 +70,9 @@ def get_args():
 
     parser.add_argument('-p', '--protocol', help='git protocol', default='ssh')
     parser.add_argument(
+        '-S', '--no-set-default', help='Do not run `gh repo set-default`'
+    )
+    parser.add_argument(
         '-V', '--version', action='version', version=f'%(prog)s {__version__}'
     )
 
@@ -100,14 +104,43 @@ def main():
     # print(remotes)
     remote_origin_exists = b'origin' in remotes
     gh_username = hostname_to_user(hostname)
+    desired_remote_url = get_desired_remote_url(
+        hostname, protocol, repo_name, gh_username
+    )
+    if not args.no_set_default:
+        subprocess.run(['gh', 'repo', 'set-default', f'{gh_username}/{repo_name}'])
+        print(f'Running `gh repo set-default {gh_username}/{repo_name}`')
     if remote_origin_exists:
         print('Remote origin exists.')
+        # run `git remote get-url origin` to get the url for the remote
+        remote_origin_url = (
+            subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True)
+            .stdout.decode()
+            .strip()
+        )
+        if remote_origin_url.removesuffix('.git') == desired_remote_url.removesuffix(
+            '.git'
+        ):
+            print(f'Remote origin URL {remote_origin_url} is already the desired one.')
+            print('Exiting.')
+            return
         if overwrite_remote_origin:
             subprocess.run(['git', 'remote', 'remove', 'origin'])
             print('Removed previous remote.')
         else:
             subprocess.run(['git', 'remote', 'rename', 'origin', 'upstream'])
             print('Renamed previous remote to upstream.')
+    subprocess.run(['git', 'remote', 'add', 'origin', desired_remote_url])
+    print(f'Added remote: {desired_remote_url}')
+
+    # create a repo on github, may fail if already exists
+    subprocess.run(['gh', 'repo', 'create', repo_name, visibility_flag])
+
+
+@cache
+def get_desired_remote_url(
+    hostname: str, protocol: str, repo_name: str, gh_username: str
+) -> str:
     if protocol == 'ssh':
         remote_url_prefix = f'git@{hostname}:'
     elif protocol == 'https':
@@ -118,11 +151,7 @@ def main():
         remote_url = f'{remote_url_prefix}{gh_username}/{repo_name}.git'
     else:
         remote_url = f'{remote_url_prefix}{repo_name}.git'
-    subprocess.run(['git', 'remote', 'add', 'origin', remote_url])
-    print(f'Added remote: {remote_url}')
-
-    # create a repo on github, may fail if already exists
-    subprocess.run(['gh', 'repo', 'create', repo_name, visibility_flag])
+    return remote_url
 
 
 if __name__ == '__main__':
