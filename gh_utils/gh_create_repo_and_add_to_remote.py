@@ -45,6 +45,9 @@ def get_args():
         default=None,
     )
 
+    # -r, --remote string          Specify remote name for the new repository
+    parser.add_argument('-r', '--remote', help='Specify remote name for the new repository', type=str, default='origin')
+
     parser.add_argument(
         '--public',
         help='Create a public repository',
@@ -53,9 +56,9 @@ def get_args():
     )
 
     parser.add_argument(
-        '--overwrite-remote-origin',
+        '--overwrite-remote',
         '--force',
-        help='Overwrites remote origin if exists',
+        help='Overwrites remote if exists',
         action='store_true',
         default=False,
     )
@@ -87,9 +90,10 @@ def main():
     append = args.append
     name = args.name
     public = args.public
-    overwrite_remote_origin = args.overwrite_remote_origin
+    overwrite_remote_origin = args.overwrite_remote
     hostname = args.hostname
     protocol = args.protocol
+    desired_remote_name = args.remote
 
     curr_path_name = Path.cwd().name
     if name is not None:
@@ -105,7 +109,7 @@ def main():
     remotes_p = subprocess.run(['git', 'remote'], capture_output=True)
     remotes = remotes_p.stdout.splitlines()
     # print(remotes)
-    remote_origin_exists = b'origin' in remotes
+    remote_origin_exists = desired_remote_name.encode() in remotes
     gh_username = hostname_to_user(hostname)
     desired_remote_url = get_desired_remote_url(
         hostname, protocol, repo_name, gh_username
@@ -114,26 +118,26 @@ def main():
         print(f'Running `gh repo set-default {gh_username}/{repo_name}`')
         subprocess.run(['gh', 'repo', 'set-default', f'{gh_username}/{repo_name}'])
     if remote_origin_exists:
-        print('Remote origin exists.')
+        print(f'Remote {desired_remote_name} exists.')
         # run `git remote get-url origin` to get the url for the remote
         remote_origin_url = (
-            subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True)
+            subprocess.run(['git', 'remote', 'get-url', desired_remote_name], capture_output=True)
             .stdout.decode()
             .strip()
         )
         if remote_origin_url.removesuffix('.git') == desired_remote_url.removesuffix(
             '.git'
         ):
-            print(f'Remote origin URL {remote_origin_url} is already the desired one.')
+            print(f'Remote {desired_remote_name} URL {remote_origin_url} is already the desired one.')
             print('Exiting.')
             return
         if overwrite_remote_origin:
-            subprocess.run(['git', 'remote', 'remove', 'origin'])
+            subprocess.run(['git', 'remote', 'remove', desired_remote_name])
             print('Removed previous remote.')
         else:
-            subprocess.run(['git', 'remote', 'rename', 'origin', 'upstream'])
+            subprocess.run(['git', 'remote', 'rename', desired_remote_name, 'upstream'])
             print('Renamed previous remote to upstream.')
-    subprocess.run(['git', 'remote', 'add', 'origin', desired_remote_url])
+    subprocess.run(['git', 'remote', 'add', desired_remote_name, desired_remote_url])
     print(f'Added remote: {desired_remote_url}')
 
     # create a repo on github, may fail if already exists
