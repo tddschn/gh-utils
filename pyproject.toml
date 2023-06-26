@@ -12,6 +12,7 @@ keywords = ["gh", "github", "utils"]
 
 [tool.poetry.scripts]
 ghcrar = "gh_utils.gh_create_repo_and_add_to_remote:main"
+ghshs = "gh_utils.switch_between_https_and_ssh_remote_types.py:main"
 
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/tddschn/gh-utils/issues"

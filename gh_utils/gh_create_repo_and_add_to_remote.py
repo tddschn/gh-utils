@@ -9,8 +9,8 @@ import argparse
 from functools import cache
 from pathlib import Path
 import subprocess
-from . import __version__
-from .utils import (
+from gh_utils import __version__
+from gh_utils.utils import (
     gh_config_yaml_get_first_hostname_and_username,
     hostname_to_user,
 )
