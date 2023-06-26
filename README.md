@@ -11,6 +11,9 @@ A collection of useful utilities that work with GitHub CLI `gh`.
       - [Features](#features)
       - [Usage](#usage)
       - [Screenshots](#screenshots)
+    - [ghshs](#ghshs)
+      - [Usage](#usage-1)
+      - [Screenshot](#screenshot)
   - [Develop](#develop)
 
 ## Installation
@@ -71,6 +74,33 @@ options:
 
 ![](images/ghcrar-dupe-url-and-set-default.png)
 
+
+### ghshs
+
+<!-- cSpell:disable -->
+**gh** **s**witch between **h**ttps and **s**sh
+<!-- cSpell:enable -->
+
+#### Usage
+
+```
+$ ghshs --help
+
+usage: ghshs [-h] [-r REMOTE] [-V]
+
+Switch between HTTPS and SSH types of GitHub remotes
+
+options:
+  -h, --help            show this help message and exit
+  -r REMOTE, --remote REMOTE
+                        Name of the remote to switch (default: origin)
+  -V, --version         show program's version number and exit
+
+```
+
+#### Screenshot
+
+![](./images/ghshs.png)
 
 ## Develop
 
