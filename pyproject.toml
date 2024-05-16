@@ -19,7 +19,7 @@ ghshs = "gh_utils.switch_between_https_and_ssh_remote_types:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-PyYAML = "^6.0"
+PyYAML = "^6.0.1"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.4.0"
