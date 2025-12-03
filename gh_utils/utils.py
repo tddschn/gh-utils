@@ -18,7 +18,7 @@ def gh_config_yaml_get_user_info(
     user_info_list: list[UserInfo] = []
     hosts_d = safe_load(gh_hosts_yaml.read_text())
     for hostname, info in hosts_d.items():
-        user_info_list.append(UserInfo(hostname=hostname, user=info['user']))
+        user_info_list.append(UserInfo(hostname=hostname, user=info["user"]))
     return user_info_list
 
 
@@ -29,7 +29,7 @@ def gh_config_yaml_get_user_info_first(
     if user_info_list:
         return user_info_list[0]
     else:
-        raise NotFoundError(f'No user info found in {str(gh_hosts_yaml)}')
+        raise NotFoundError(f"No user info found in {str(gh_hosts_yaml)}")
 
 
 @cache
@@ -37,14 +37,14 @@ def gh_config_yaml_get_first_hostname_and_username(
     gh_hosts_yaml: Path = DEFAULT_GH_HOSTS_YML_PATH,
 ) -> tuple[str, str]:
     user_info = gh_config_yaml_get_user_info_first(gh_hosts_yaml)
-    return user_info['hostname'], user_info['user']
+    return user_info["hostname"], user_info["user"]
 
 
 def hostname_to_user(
     hostname: str, gh_hosts_yaml: Path = DEFAULT_GH_HOSTS_YML_PATH
 ) -> str:
     for user_info in gh_config_yaml_get_user_info(gh_hosts_yaml):
-        if user_info['hostname'] == hostname:
-            return user_info['user']
+        if user_info["hostname"] == hostname:
+            return user_info["user"]
     else:
-        raise NotFoundError(f'No user info found for hostname {hostname}')
+        raise NotFoundError(f"No user info found for hostname {hostname}")
