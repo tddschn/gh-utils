@@ -6,9 +6,11 @@ Purpose: gh_create_repo_and_add_to_remote
 """
 
 import argparse
+import shlex
+import subprocess
 from functools import cache
 from pathlib import Path
-import subprocess
+from typing import cast
 from gh_utils import __version__
 from gh_utils.utils import (
     gh_config_yaml_get_first_hostname_and_username,
@@ -16,6 +18,29 @@ from gh_utils.utils import (
 )
 
 __app_name__ = "ghcrar"
+
+
+def _format_command(cmd: list[str]) -> str:
+    return " ".join(shlex.quote(str(part)) for part in cmd)
+
+
+def run_command(
+    cmd: list[str],
+    *,
+    dry_run: bool,
+    mutating: bool = True,
+    **kwargs,
+):
+    printable = _format_command(cmd)
+    if dry_run:
+        if mutating:
+            print(f"[dry-run] Would run: {printable}")
+            if kwargs.get("capture_output"):
+                empty = "" if kwargs.get("text") else b""
+                return subprocess.CompletedProcess(cmd, 0, stdout=empty, stderr=empty)
+            return subprocess.CompletedProcess(cmd, 0)
+        print(f"[dry-run] Inspecting state with: {printable}")
+    return subprocess.run(cmd, **kwargs)
 
 
 def get_args():
@@ -37,7 +62,7 @@ def get_args():
     )
 
     parser.add_argument(
-        "-n",
+        "-N",
         "--name",
         help="The string to use as GitHub repo name, or <user|org>/<repo-name> with a slash",
         metavar="GITHUB REPO NAME",
@@ -85,6 +110,12 @@ def get_args():
         action="store_true",
     )
     parser.add_argument(
+        "-n",
+        "--dry-run",
+        help="Show commands without executing changes",
+        action="store_true",
+    )
+    parser.add_argument(
         "-V", "--version", action="version", version=f"%(prog)s {__version__}"
     )
 
@@ -100,6 +131,7 @@ def main():
     hostname = args.hostname
     protocol = args.protocol
     desired_remote_name = args.remote
+    dry_run = args.dry_run
 
     curr_path_name = Path.cwd().name
     if name is not None:
@@ -109,13 +141,19 @@ def main():
     visibility_flag = "--public" if public else "--private"
 
     # (re) init the repo
-    subprocess.run(["git", "init"])
+    run_command(["git", "init"], dry_run=dry_run)
 
     # add to remote
-    remotes_p = subprocess.run(["git", "remote"], capture_output=True)
+    remotes_p = run_command(
+        ["git", "remote"],
+        capture_output=True,
+        text=True,
+        dry_run=dry_run,
+        mutating=False,
+    )
     remotes = remotes_p.stdout.splitlines()
     # print(remotes)
-    remote_origin_exists = desired_remote_name.encode() in remotes
+    remote_origin_exists = desired_remote_name in remotes
     gh_username = hostname_to_user(hostname)
     desired_remote_url = get_desired_remote_url(
         hostname, protocol, repo_name, gh_username
@@ -123,12 +161,15 @@ def main():
     if remote_origin_exists:
         print(f"Remote {desired_remote_name} exists.")
         # run `git remote get-url origin` to get the url for the remote
-        remote_origin_url = (
-            subprocess.run(
-                ["git", "remote", "get-url", desired_remote_name], capture_output=True
-            )
-            .stdout.decode()
-            .strip()
+        remote_origin_url = cast(
+            str,
+            run_command(
+                ["git", "remote", "get-url", desired_remote_name],
+                capture_output=True,
+                text=True,
+                dry_run=dry_run,
+                mutating=False,
+            ).stdout.strip(),
         )
         if remote_origin_url.removesuffix(".git") == desired_remote_url.removesuffix(
             ".git"
@@ -139,20 +180,31 @@ def main():
             print("Exiting.")
             return
         if overwrite_remote_origin:
-            subprocess.run(["git", "remote", "remove", desired_remote_name])
+            run_command(
+                ["git", "remote", "remove", desired_remote_name], dry_run=dry_run
+            )
             print("Removed previous remote.")
         else:
-            subprocess.run(["git", "remote", "rename", desired_remote_name, "upstream"])
+            run_command(
+                ["git", "remote", "rename", desired_remote_name, "upstream"],
+                dry_run=dry_run,
+            )
             print("Renamed previous remote to upstream.")
-    subprocess.run(["git", "remote", "add", desired_remote_name, desired_remote_url])
+    run_command(
+        ["git", "remote", "add", desired_remote_name, desired_remote_url],
+        dry_run=dry_run,
+    )
     print(f"Added remote: {desired_remote_url}")
 
     # create a repo on github, may fail if already exists
-    subprocess.run(["gh", "repo", "create", repo_name, visibility_flag])
+    run_command(["gh", "repo", "create", repo_name, visibility_flag], dry_run=dry_run)
 
     if not args.no_set_default:
         print(f"Running `gh repo set-default {gh_username}/{repo_name}`")
-        subprocess.run(["gh", "repo", "set-default", f"{gh_username}/{repo_name}"])
+        run_command(
+            ["gh", "repo", "set-default", f"{gh_username}/{repo_name}"],
+            dry_run=dry_run,
+        )
 
 
 @cache
